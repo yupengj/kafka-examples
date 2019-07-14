@@ -1,0 +1,16 @@
+.gradle
+.settings
+.svn
+.classpath
+.project
+.idea
+*.iml
+
+/*/bin
+/*/build
+/*/out
+
+.DS_Store
+/logs
+
+*.log
