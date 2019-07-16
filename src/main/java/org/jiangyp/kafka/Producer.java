@@ -1,7 +1,6 @@
 package org.jiangyp.kafka;
 
 import java.util.Properties;
-import java.util.Random;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -13,7 +12,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
  */
 public class Producer {
 
-	//	private final static Logger log = LoggerFactory.getLogger(Consumer.class);
+	//		private final static Logger log = LoggerFactory.getLogger(Producer.class);
 
 	public static String TOPIC = "test_1";//定义主题
 
@@ -25,8 +24,9 @@ public class Producer {
 		KafkaProducer<String, String> kafkaProducer = new KafkaProducer<>(p);
 
 		try {
+			int i = 0;
 			while (true) {
-				String msg = "Hello," + new Random().nextInt(100);
+				String msg = "Hello," + (i++);
 				ProducerRecord<String, String> record = new ProducerRecord<>(TOPIC, msg);
 				kafkaProducer.send(record);
 				//				log.info("消息发送成功: {} ", msg);
