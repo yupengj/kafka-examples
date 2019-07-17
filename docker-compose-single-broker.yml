@@ -10,7 +10,7 @@ services:
       - "9092:9092"
     environment:
       KAFKA_LISTENERS: PLAINTEXT://:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://192.168.1.5:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://192.168.1.5:9092 #虚拟机ip，如果是本地可以写localhost
       KAFKA_CREATE_TOPICS: "test:1:1"
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     volumes:
