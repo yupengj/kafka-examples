@@ -1,41 +1,79 @@
 package org.jiangyp.kafka;
 
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 
+import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 /**
  * 消息生产者
  */
 public class Producer {
-
-	//		private final static Logger log = LoggerFactory.getLogger(Producer.class);
-
-	public static String TOPIC = "test_1";//定义主题
-
 	public static void main(String[] args) throws InterruptedException {
 		Properties p = new Properties();
-		p.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.1.5:9092");//kafka地址，多个地址用逗号分割
-		p.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+		p.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaProperties.KAFKA_SERVER_URL + ":" + KafkaProperties.KAFKA_SERVER_PORT);
+		p.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, IntegerSerializer.class);
 		p.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-		KafkaProducer<String, String> kafkaProducer = new KafkaProducer<>(p);
+		KafkaProducer<Integer, String> kafkaProducer = new KafkaProducer<>(p);
+
+		boolean isAsync = false;
 
 		try {
-			int i = 0;
+			int messageNo = 1;
 			while (true) {
-				String msg = "Hello," + (i++);
-				ProducerRecord<String, String> record = new ProducerRecord<>(TOPIC, msg);
-				kafkaProducer.send(record);
-				//				log.info("消息发送成功: {} ", msg);
-				System.out.println("消息发送成功: {} " + msg);
-				Thread.sleep(500);
+				String messageStr = "Message_" + messageNo;
+				long startTime = System.currentTimeMillis();
+				if (isAsync) {
+					kafkaProducer.send(new ProducerRecord<>(KafkaProperties.TOPIC, messageNo, messageStr), new DemoCallBack(startTime, messageNo, messageStr));
+				} else {
+					try {
+						kafkaProducer.send(new ProducerRecord<>(KafkaProperties.TOPIC, messageNo, messageStr)).get();
+						System.out.println("Sent message: (" + messageNo + ", " + messageStr + ")");
+					} catch (InterruptedException | ExecutionException e) {
+						e.printStackTrace();
+					}
+				}
+				++messageNo;
 			}
 		} finally {
 			kafkaProducer.close();
 		}
 
+	}
+}
+
+class DemoCallBack implements Callback {
+
+	private final long startTime;
+	private final int key;
+	private final String message;
+
+	public DemoCallBack(long startTime, int key, String message) {
+		this.startTime = startTime;
+		this.key = key;
+		this.message = message;
+	}
+
+	/**
+	 * 回调
+	 *
+	 * @param metadata  metadata
+	 * @param exception exception
+	 */
+	public void onCompletion(RecordMetadata metadata, Exception exception) {
+		long elapsedTime = System.currentTimeMillis() - startTime;
+		if (metadata != null) {
+			System.out.println(
+					"message(" + key + ", " + message + ") sent to partition(" + metadata.partition() + "), " + "offset(" + metadata.offset() + ") in "
+							+ elapsedTime + " ms");
+		} else {
+			exception.printStackTrace();
+		}
 	}
 }
