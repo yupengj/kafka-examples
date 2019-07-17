@@ -15,14 +15,14 @@ import org.apache.kafka.common.serialization.StringSerializer;
  * 消息生产者
  */
 public class Producer {
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) {
 		Properties p = new Properties();
 		p.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaProperties.KAFKA_SERVER_URL + ":" + KafkaProperties.KAFKA_SERVER_PORT);
 		p.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, IntegerSerializer.class);
 		p.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 		KafkaProducer<Integer, String> kafkaProducer = new KafkaProducer<>(p);
 
-		boolean isAsync = false;
+		boolean isAsync = true;
 
 		try {
 			int messageNo = 1;
