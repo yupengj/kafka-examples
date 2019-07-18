@@ -15,9 +15,12 @@ import org.apache.kafka.common.serialization.StringSerializer;
  * 消息生产者
  */
 public class Producer {
+
+	public static final String TOPIC = "test_1";
+
 	public static void main(String[] args) {
 		Properties p = new Properties();
-		p.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaProperties.KAFKA_SERVER_URL + ":" + KafkaProperties.KAFKA_SERVER_PORT);
+		p.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka1:9092,kafka2:9092,kafka3:9092");
 		p.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, IntegerSerializer.class);
 		p.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 		KafkaProducer<Integer, String> kafkaProducer = new KafkaProducer<>(p);
@@ -30,10 +33,10 @@ public class Producer {
 				String messageStr = "Message_" + messageNo;
 				long startTime = System.currentTimeMillis();
 				if (isAsync) {
-					kafkaProducer.send(new ProducerRecord<>(KafkaProperties.TOPIC, messageNo, messageStr), new DemoCallBack(startTime, messageNo, messageStr));
+					kafkaProducer.send(new ProducerRecord<>(TOPIC, messageNo, messageStr), new DemoCallBack(startTime, messageNo, messageStr));
 				} else {
 					try {
-						kafkaProducer.send(new ProducerRecord<>(KafkaProperties.TOPIC, messageNo, messageStr)).get();
+						kafkaProducer.send(new ProducerRecord<>(TOPIC, messageNo, messageStr)).get();
 						System.out.println("Sent message: (" + messageNo + ", " + messageStr + ")");
 					} catch (InterruptedException | ExecutionException e) {
 						e.printStackTrace();
