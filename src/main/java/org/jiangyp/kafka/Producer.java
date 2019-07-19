@@ -20,7 +20,8 @@ public class Producer {
 
 	public static void main(String[] args) {
 		Properties p = new Properties();
-		p.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.4.109:32783");
+//		p.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
+		p.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.1.4:9092");
 		p.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, IntegerSerializer.class);
 		p.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 		KafkaProducer<Integer, String> kafkaProducer = new KafkaProducer<>(p);
