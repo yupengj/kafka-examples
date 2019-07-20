@@ -19,36 +19,34 @@ public class Producer {
 	public static final String TOPIC = "test_1";
 
 	public static void main(String[] args) {
-		Properties p = new Properties();
-//		p.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
-		p.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.1.4:9092");
-		p.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, IntegerSerializer.class);
-		p.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-		KafkaProducer<Integer, String> kafkaProducer = new KafkaProducer<>(p);
+		Properties props = new Properties();
+		//		props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.1.4:9092"); // kafka 单节点
+		props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.1.4:9091,192.168.1.4:9092,192.168.1.4:9093"); // kafka 多节点
+		props.put(ProducerConfig.CLIENT_ID_CONFIG, "clicet1");
+		props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, IntegerSerializer.class);
+		props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+		KafkaProducer<Integer, String> kafkaProducer = new KafkaProducer<>(props);
 
 		boolean isAsync = true;
-
-		try {
-			int messageNo = 1;
-			while (true) {
-				String messageStr = "Message_" + messageNo;
-				long startTime = System.currentTimeMillis();
-				if (isAsync) {
-					kafkaProducer.send(new ProducerRecord<>(TOPIC, messageNo, messageStr), new DemoCallBack(startTime, messageNo, messageStr));
-				} else {
-					try {
-						kafkaProducer.send(new ProducerRecord<>(TOPIC, messageNo, messageStr)).get();
-						System.out.println("Sent message: (" + messageNo + ", " + messageStr + ")");
-					} catch (InterruptedException | ExecutionException e) {
-						e.printStackTrace();
-					}
+		int messageNo = 1;
+		while (true) {
+			String messageStr = "Message_" + messageNo;
+			long startTime = System.currentTimeMillis();
+			if (isAsync) {
+				kafkaProducer.send(new ProducerRecord<>(TOPIC, messageStr), new DemoCallBack(startTime, messageNo, messageStr));
+			} else {
+				try {
+					kafkaProducer.send(new ProducerRecord<>(TOPIC, messageStr)).get();
+					System.out.println("Sent message: (" + messageNo + ", " + messageStr + ")");
+				} catch (InterruptedException | ExecutionException e) {
+					e.printStackTrace();
 				}
-				++messageNo;
 			}
-		} finally {
-			kafkaProducer.close();
+			++messageNo;
+			//			if (messageNo == 10) {
+			//				break;
+			//			}
 		}
-
 	}
 }
 

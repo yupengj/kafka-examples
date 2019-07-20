@@ -16,14 +16,14 @@ import org.apache.kafka.common.serialization.StringDeserializer;
  */
 public class Consumer {
 	public static void main(String[] args) {
-		Properties p = new Properties();
-//		p.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
-		p.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.1.4:9092");
-		p.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, IntegerDeserializer.class);
-		p.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-		p.put(ConsumerConfig.GROUP_ID_CONFIG, "consumer1");
+		Properties props = new Properties();
+		//		props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.1.4:9092"); // kafka 单节点
+		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.1.4:9091,192.168.1.4:9092,192.168.1.4:9093");  // kafka 多节点
+		props.put(ConsumerConfig.GROUP_ID_CONFIG, "group1");
+		props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, IntegerDeserializer.class);
+		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 
-		KafkaConsumer<Integer, String> kafkaConsumer = new KafkaConsumer<>(p);
+		KafkaConsumer<Integer, String> kafkaConsumer = new KafkaConsumer<>(props);
 		kafkaConsumer.subscribe(Collections.singletonList(Producer.TOPIC));
 		while (true) {
 			ConsumerRecords<Integer, String> records = kafkaConsumer.poll(Duration.ofSeconds(1));
