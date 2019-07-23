@@ -16,4 +16,4 @@ services:
       KAFKA_CREATE_TOPICS: "test1:1:1" # 自动创建一个 名称为 test1 的 topic 分区是1 副本是1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/jyp/volume/kfksingle/kafka/logs:/kafka # kafak 数据挂载到主机地址

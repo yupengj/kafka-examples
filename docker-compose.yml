@@ -1,20 +1,38 @@
 version: '2'
 services:
-  zookeeper1:
-    image: wurstmeister/zookeeper
-    hostname: zookeeper1
+  zoo1:
+    image: zookeeper
+    hostname: zoo1
     ports:
       - "2181:2181"
-  zookeeper2:
-    image: wurstmeister/zookeeper
-    hostname: zookeeper2
+    volumes:
+      - /home/jyp/volume/zkcluster/zoo1/data:/data
+      - /home/jyp/volume/zkcluster/zoo1/datalog:/datalog
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=0.0.0.0:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=zoo3:2888:3888;2181
+  zoo2:
+    image: zookeeper
+    hostname: zoo2
     ports:
       - "2182:2181"
-  zookeeper3:
-    image: wurstmeister/zookeeper
-    hostname: zookeeper3
+    volumes:
+      - /home/jyp/volume/zkcluster/zoo2/data:/data
+      - /home/jyp/volume/zkcluster/zoo2/datalog:/datalog
+    environment:
+      ZOO_MY_ID: 2
+      ZOO_SERVERS: server.1=zoo1:2888:3888;2181 server.2=0.0.0.0:2888:3888;2181 server.3=zoo3:2888:3888;2181
+  zoo3:
+    image: zookeeper
+    hostname: zoo3
     ports:
       - "2183:2181"
+    volumes:
+      - /home/jyp/volume/zkcluster/zoo3/data:/data
+      - /home/jyp/volume/zkcluster/zoo3/datalog:/datalog
+    environment:
+      ZOO_MY_ID: 3
+      ZOO_SERVERS: server.1=zoo1:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=0.0.0.0:2888:3888;2181
   kafka1:
     image: wurstmeister/kafka:2.12-2.3.0
     hostname: kafka1
@@ -24,9 +42,9 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_LISTENERS: PLAINTEXT://:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://192.168.1.4:9091
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+      KAFKA_ZOOKEEPER_CONNECT: zoo1:2181,zoo2:2181,zoo3:2181
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/jyp/volume/kfkcluster/kafka1/logs:/kafka
   kafka2:
     image: wurstmeister/kafka:2.12-2.3.0
     hostname: kafka2
@@ -36,9 +54,9 @@ services:
       KAFKA_BROKER_ID: 2
       KAFKA_LISTENERS: PLAINTEXT://:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://192.168.1.4:9092
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+      KAFKA_ZOOKEEPER_CONNECT: zoo1:2181,zoo2:2181,zoo3:2181
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/jyp/volume/kfkcluster/kafka2/logs:/kafka
   kafka3:
     image: wurstmeister/kafka:2.12-2.3.0
     hostname: kafka3
@@ -48,6 +66,23 @@ services:
       KAFKA_BROKER_ID: 3
       KAFKA_LISTENERS: PLAINTEXT://:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://192.168.1.4:9093
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+      KAFKA_ZOOKEEPER_CONNECT: zoo1:2181,zoo2:2181,zoo3:2181
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/jyp/volume/kfkcluster/kafka3/logs:/kafka
+  kafka-manager:
+    image: sheepkiller/kafka-manager
+    hostname: kafka-manager
+    ports:
+      - "9000:9000"
+    links:
+      - kafka1
+      - kafka2
+      - kafka3
+      - zoo1
+      - zoo2
+      - zoo3
+    environment:
+      KM_VERSION: 2.0.0.2
+      ZK_HOSTS: "zoo1:2181,zoo2:2181,zoo3:2181"
+      APPLICATION_SECRET: "letmein"
+#      KM_ARGS: -Djava.net.preferIPv4Stack=true
