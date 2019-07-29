@@ -1,6 +1,7 @@
 version: '2'
 services:
   zoo1:
+    container_name: zoo1
     image: zookeeper
     hostname: zoo1
     ports:
@@ -12,6 +13,7 @@ services:
       ZOO_MY_ID: 1
       ZOO_SERVERS: server.1=0.0.0.0:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=zoo3:2888:3888;2181
   zoo2:
+    container_name: zoo2
     image: zookeeper
     hostname: zoo2
     ports:
@@ -23,6 +25,7 @@ services:
       ZOO_MY_ID: 2
       ZOO_SERVERS: server.1=zoo1:2888:3888;2181 server.2=0.0.0.0:2888:3888;2181 server.3=zoo3:2888:3888;2181
   zoo3:
+    container_name: zoo3
     image: zookeeper
     hostname: zoo3
     ports:
@@ -34,6 +37,7 @@ services:
       ZOO_MY_ID: 3
       ZOO_SERVERS: server.1=zoo1:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=0.0.0.0:2888:3888;2181
   kafka1:
+    container_name: kafka1
     image: wurstmeister/kafka:2.12-2.3.0
     hostname: kafka1
     ports:
@@ -46,6 +50,7 @@ services:
     volumes:
       - /home/jyp/volume/kfkcluster/kafka1/logs:/kafka
   kafka2:
+    container_name: kafka2
     image: wurstmeister/kafka:2.12-2.3.0
     hostname: kafka2
     ports:
@@ -58,6 +63,7 @@ services:
     volumes:
       - /home/jyp/volume/kfkcluster/kafka2/logs:/kafka
   kafka3:
+    container_name: kafka3
     image: wurstmeister/kafka:2.12-2.3.0
     hostname: kafka3
     ports:
@@ -70,6 +76,7 @@ services:
     volumes:
       - /home/jyp/volume/kfkcluster/kafka3/logs:/kafka
   kafka-manager:
+    container_name: kafka-manager
     image: sheepkiller/kafka-manager
     hostname: kafka-manager
     ports:
