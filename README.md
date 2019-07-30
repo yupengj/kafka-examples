@@ -1,4 +1,4 @@
-# kafka-examples 本地开发环境搭建
+# kafka 本地开发环境搭建
 
 ## docker 安装
 > 需要安装 docker(Docker version 18.09.6) 和 docker-compose(docker-compose version 1.8.0)
