@@ -15,28 +15,23 @@
 
 # Builds a docker image for Kafka Connect
 
-FROM confluentinc/cp-kafka-connect-base:5.3.0
+FROM debezium/connect-base:0.9
 
-MAINTAINER jiangyp
-LABEL io.confluent.docker=true
-ARG COMMIT_ID=unknown
-LABEL io.confluent.docker.git.id=$COMMIT_ID
-ARG BUILD_NUMBER=-1
-LABEL io.confluent.docker.build.number=$BUILD_NUMBER
+LABEL maintainer="Debezium Community"
 
-ENV COMPONENT=kafka-connect
+ENV DEBEZIUM_VERSION="0.9.5.Final" \
+    MAVEN_REPO_CORE="https://repo1.maven.org/maven2" \
+    MAVEN_DEP_DESTINATION=$KAFKA_CONNECT_PLUGINS_DIR \
+    MONGODB_MD5=a9bde9c4173d4c4f3c0adc9d97a795ee \
+    MYSQL_MD5=720b1396358fbdc59bce953f47d3c53f \
+    POSTGRES_MD5=a838ae664b7d8d050419d3e638e64273 \
+    SQLSERVER_MD5=f21ef11e7b3e34736d428eb1d6ce5450 \
+    ORACLE_MD5=1b93c90502d5d369e5a7173759de2504
 
-# 安装 Elasticsearch 有问题
-#RUN echo "===> Installing Elasticsearch ..." \
-#    && apt-get -qq update \
-#    && apt-get install -y \
-#        confluent-kafka-connect-elasticsearch=${CONFLUENT_VERSION}${CONFLUENT_PLATFORM_LABEL}-${CONFLUENT_DEB_VERSION} \
-#    && echo "===> Cleaning up ..."  \
-#    && apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/*
+RUN docker-maven-download debezium postgres "$DEBEZIUM_VERSION" "$POSTGRES_MD5"
 
-RUN echo "===> Installing Postgres-connector ..."
-RUN curl -k -SL "https://search.maven.org/remotecontent?filepath=io/debezium/debezium-connector-postgres/0.9.5.Final/debezium-connector-postgres-0.9.5.Final-plugin.tar.gz" \
-     | tar -xzf - -C /usr/share/java/kafka/ --strip-components=1 debezium-connector-postgres/postgresql-42.2.5.jar
-
-RUN echo "===> Installing GCS Sink Connector ..."
-RUN confluent-hub install confluentinc/kafka-connect-gcs:latest --no-prompt
+#RUN docker-maven-download debezium postgres "$DEBEZIUM_VERSION" "$MONGODB_MD5" && \
+#    docker-maven-download debezium mysql "$DEBEZIUM_VERSION" "$MYSQL_MD5" && \
+#    docker-maven-download debezium postgres "$DEBEZIUM_VERSION" "$POSTGRES_MD5" && \
+#    docker-maven-download debezium sqlserver "$DEBEZIUM_VERSION" "$SQLSERVER_MD5" && \
+#    docker-maven-download debezium oracle "$DEBEZIUM_VERSION" "$ORACLE_MD5"
