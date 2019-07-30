@@ -79,7 +79,7 @@ curl localhost/connectors/ibom-connector/config
 ```
 
 ## 修改记录
-- [x] 修改 kafka , zookeeper 镜像，同一使用 confluentin 和公司 kafka 集群使用相同的镜像
+- [x] 修改 kafka , zookeeper 镜像，统一使用 confluentin 和公司 kafka 集群使用相同的镜像
 - [x] 增加带有 wal2json 插件的 postgresql 数据库容器
 - [x] 增加连接器可以读取 postgresql 数据到 kafka 中
 - [ ] 把 kafka-manager 加到公司集群
