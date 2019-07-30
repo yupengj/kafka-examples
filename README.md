@@ -85,11 +85,12 @@ curl localhost/connectors/ibom-connector/config
 - [ ] 把 kafka-manager 加到公司集群
 
 
+----
+
 ## 参考地址
 - docker-compose 命令文档: https://docs.docker.com/glossary/?term=Compose
 - kafka-connect 文档: http://kafka.apache.org/documentation/#connect
 - kafka-connect-postgres 连接器: https://www.confluent.io/hub/debezium/debezium-connector-postgresql
 - confluentinc/cp-kafka-connect 增加连接器说明文档: https://docs.confluent.io/current/installation/docker/development.html#adding-connectors-to-images
 
-----
-## [集群 kafka 环境搭建](doc/docker%20kafka%20集群环境搭建(3个%20zookeeper%203个kafka).md)
+
