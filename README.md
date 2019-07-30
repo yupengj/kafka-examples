@@ -92,5 +92,50 @@ curl localhost/connectors/ibom-connector/config
 - kafka-connect 文档: http://kafka.apache.org/documentation/#connect
 - kafka-connect-postgres 连接器: https://www.confluent.io/hub/debezium/debezium-connector-postgresql
 - confluentinc/cp-kafka-connect 增加连接器说明文档: https://docs.confluent.io/current/installation/docker/development.html#adding-connectors-to-images
+- confluentinc 镜像仓库: https://hub.docker.com/u/confluentinc
 
+----
 
+## confluentinc/cp-kafka-connect:5.3.0 默认已装的连接器
+```json
+[{
+    "class": "io.confluent.connect.activemq.ActiveMQSourceConnector", 
+    "type": "source", 
+    "version": "5.3.0"
+},{
+    "class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector", 
+    "type": "sink", 
+    "version": "5.3.0"
+},{
+    "class": "io.confluent.connect.ibm.mq.IbmMQSourceConnector", 
+    "type": "source", 
+    "version": "5.3.0"
+},{
+    "class": "io.confluent.connect.jdbc.JdbcSinkConnector", 
+    "type": "sink", 
+    "version": "5.3.0"
+},{
+    "class": "io.confluent.connect.jdbc.JdbcSourceConnector", 
+    "type": "source", 
+    "version": "5.3.0"
+},{
+    "class": "io.confluent.connect.jms.JmsSourceConnector", 
+    "type": "source", 
+    "version": "5.3.0"
+},{
+    "class": "io.confluent.connect.s3.S3SinkConnector", 
+    "type": "sink", 
+    "version": "5.3.0"
+},{
+    "class": "io.confluent.connect.storage.tools.SchemaSourceConnector", 
+    "type": "source", 
+    "version": "5.3.0-ccs"
+},{
+    "class": "org.apache.kafka.connect.file.FileStreamSinkConnector", 
+    "type": "sink", 
+    "version": "5.3.0-ccs"
+},{
+    "class": "org.apache.kafka.connect.file.FileStreamSourceConnector", 
+    "type": "source", 
+    "version": "5.3.0-ccs"
+}]
