@@ -1,4 +1,3 @@
-# 图数据库
 version: "3.2"
 services:
   zero:

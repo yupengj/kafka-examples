@@ -1,4 +1,3 @@
-# 单机本地测试
 version: '2'
 services:
   zookeeper:
@@ -22,9 +21,9 @@ services:
       - zookeeper
     environment:
       KAFKA_BROKER_ID: 1 # 设置 broker_id 属性时 kafka 的 ip 换了也不会影响 topics 的读取。
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://192.168.4.109:9092 # 192.168.1.6 是虚拟机的iP , 如果是本地就可以写 localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://192.168.1.6:9092 # 192.168.1.6 是虚拟机的iP , 如果是本地就可以写 localhost:9092
       KAFKA_CREATE_TOPICS: "test1:1:1" # 自动创建一个 名称为 test1 的 topic 分区是1 副本是1
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 # We have only 1 broker, so offsets topic can only have one replication factor.
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LOG_RETENTION_HOURS: 700800
     volumes:
@@ -42,23 +41,23 @@ services:
       - kafka
     environment:
       CONNECT_BOOTSTRAP_SERVERS: kafka:9092
-      CONNECT_REST_PORT: 8083 # Kafka connect creates an endpoint in order to add connectors
+      CONNECT_REST_PORT: 8083
       CONNECT_REST_ADVERTISED_HOST_NAME: "kafka-connect"
       CONNECT_GROUP_ID: kafka-connect
       CONNECT_ZOOKEEPER_CONNECT: zookeeper:2181
       CONNECT_CONFIG_STORAGE_TOPIC: kafka-connect-config
       CONNECT_OFFSET_STORAGE_TOPIC: kafka-connect-offsets
       CONNECT_STATUS_STORAGE_TOPIC: kafka-connect-status
-      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1 # We have only 1 broker, so we can only have 1 replication factor.
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
       CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
       CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
-      CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.storage.StringConverter" # We receive a string as key and a json as value
+      CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.storage.StringConverter"
       CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
       CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.storage.StringConverter"
       CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
       CONNECT_PLUGIN_PATH: /usr/share/java,/etc/kafka-connect/jars
     volumes:
-      - ./connect-plugins:/etc/kafka-connect/jars
+      - ./connect-plugins:/etc/kafka-connect/jars # 容器插件挂载地址，把插件的 jar 包放到挂载的目录，启动时该容器就可以自动加载插件
 
   postgresql:
     image: debezium/postgres:10
