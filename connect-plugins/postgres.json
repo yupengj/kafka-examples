@@ -1,15 +1,15 @@
 {
-  "name": "kafka-connect",
+  "name": "ibom-connect",
   "config": {
     "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
     "tasks.max": "1",
     "database.hostname": "postgres",
     "database.port": "5432",
     "database.user": "postgres",
-    "database.password": "123456",
+    "database.password": "postgres",
     "database.dbname": "postgres",
     "database.server.name": "ibom",
-    "schema.whitelist": "mstdata,cfgmgmt,chgmgmt,bommgmt",
+    "schema.whitelist": "mstdata",
     "table.blacklist": "",
     "plugin.name": "wal2json",
     "snapshot.mode": "initial",
