@@ -25,7 +25,7 @@ docker-compose --version
 
 ## 测试消息通道
 
-- 控制台测试消息通道,网上找了一个只要修改 zookeeper 和 kafka 名称即可。 https://blog.csdn.net/qq_41665356/article/details/80376075
+- 控制台测试消息通道,网上有很多这里不详细说明了
 - kafka client API 测试消息通道,启动 [Producer类](/src/main/java/org/jiangyp/kafka/Producer.java) 和 [Consumer类](/src/main/java/org/jiangyp/kafka/Consumer.java)
 
 ## 常用命令
