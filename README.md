@@ -66,16 +66,16 @@ curl -X POST localhost:8083/connectors/ibom-connector/restart
 curl -X DELETE localhost:8083/connectors/ibom-connector
 
 # 查询所有连接器
-curl localhost/connector-plugins
+curl localhost:8083/connector-plugins
 
 # 查看现在活跃的连接器
-curl localhost/connectors
+curl localhost:8083/connectors
 
 # 查看连接器状态
-curl localhost/connectors/ibom-connector/status
+curl localhost:8083/connectors/ibom-connector/status
 
 # 查看连接器配置
-curl localhost/connectors/ibom-connector/config
+curl localhost:8083/connectors/ibom-connector/config
 ```
 
 ## 修改记录
