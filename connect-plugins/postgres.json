@@ -13,6 +13,8 @@
     "table.blacklist": "",
     "plugin.name": "wal2json",
     "snapshot.mode": "initial",
-    "slot.name": "debezium"
+    "slot.name": "debezium",
+    "key.converter":"org.apache.kafka.connect.json.JsonConverter",
+    "value.converter":"org.apache.kafka.connect.json.JsonConverter"
   }
 }

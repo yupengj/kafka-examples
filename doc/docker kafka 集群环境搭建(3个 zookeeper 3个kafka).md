@@ -113,3 +113,5 @@ kafka-console-consumer.sh --bootstrap-server kafka_kafka1_1:9092,kafka_kafka2_1:
 - 需要 vpn 连接到 kubernetes 中 kafka 集群的10网段。(vpn会发到群里)
 - 修改 java 生产者和消费者程序的 `ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG` 配置，修改为 `10.97.57.83:9092`。启动两个程序就可以发送消息和接收消息了
 - 查看 topics 访问 http://10.102.61.175:8000 地址会看到所有的 topics 信息。如果连接 kafka 集群测试建议 topics 以自己名称开始
+
+

@@ -8,7 +8,6 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.common.serialization.IntegerDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
 /**
@@ -17,11 +16,11 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 public class Consumer {
 	public static void main(String[] args) {
 		Properties props = new Properties();
-				props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.4.109:9092"); // kafka 单节点
-//		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.1.4:9091,192.168.1.4:9092,192.168.1.4:9093");  // 本地 docker kafka 集群
-//				props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "10.97.57.83:9092"); // kubernetes  kafka 集群
-		props.put(ConsumerConfig.GROUP_ID_CONFIG, "group1");
-		props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, IntegerDeserializer.class);
+		//		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.4.109:9092"); // kafka 单节点
+		//		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.1.4:9091,192.168.1.4:9092,192.168.1.4:9093");  // 本地 docker kafka 集群
+		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.2.26:9092"); // kubernetes  kafka 集群
+		props.put(ConsumerConfig.GROUP_ID_CONFIG, "group2");
+		props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 
 		KafkaConsumer<Integer, String> kafkaConsumer = new KafkaConsumer<>(props);
