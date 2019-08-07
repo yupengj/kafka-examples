@@ -19,7 +19,7 @@ docker-compose --version
 3. 在 docker-compose.yml 所在位置新建文件夹 connect-plugins， 并下载 postgres 连接器插件 [debezium-connector-postgres](https://github.com/yupengj/kafka-examples/raw/master/connect-plugins/debezium-connector-postgres-0.9.5.Final-plugin.tar.gz) 把解压后的所有jar复制到 connect-plugins 文件夹中。把 [postgres
 .json](/connect-plugins/postgres.json)
 文件也一并复制到 connect-plugins 文件夹下。后面启动连接器时使用
-4. 在 `docker-compose.yml.yml` 文件所在的位置执行命令 `docker-compose up -d` 会自动下载镜像
+4. 在 `docker-compose.yml` 文件所在的位置执行命令 `docker-compose up -d` 会自动下载镜像
 5. 继续执行 `docker-compose ps` 查看所有容器是否为 Up(代表已启动) 状态
 6. 启动 postgres 连接器执行命令 `curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" localhost:8083/connectors/ -d @connect-plugins/postgres.json`
 
