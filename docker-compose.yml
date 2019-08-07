@@ -21,13 +21,13 @@ services:
       - zookeeper
     environment:
       KAFKA_BROKER_ID: 1 # 设置 broker_id 属性时 kafka 的 ip 换了也不会影响 topics 的读取。
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://192.168.1.6:9092 # 192.168.1.6 是虚拟机的iP , 如果是本地就可以写 localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092 # 192.168.1.6 是虚拟机的iP , 如果是本地就可以写 localhost:9092
       KAFKA_CREATE_TOPICS: "test1:1:1" # 自动创建一个 名称为 test1 的 topic 分区是1 副本是1
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LOG_RETENTION_HOURS: 700800
     volumes:
-      - ./kafka/logs:/kafka # kafak 数据挂载到主机地址
+      - ./kafka/data:/var/lib/kafka/data # kafak 数据挂载到主机地址
 
   connect:
     image: confluentinc/cp-kafka-connect:5.3.0
@@ -51,13 +51,29 @@ services:
       CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
       CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
       CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
-      CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.storage.StringConverter"
+      CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
       CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
-      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.storage.StringConverter"
+      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
       CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
       CONNECT_PLUGIN_PATH: /usr/share/java,/etc/kafka-connect/jars
     volumes:
       - ./connect-plugins:/etc/kafka-connect/jars # 容器插件挂载地址，把插件的 jar 包放到挂载的目录，启动时该容器就可以自动加载插件
+
+  kafka-manager:
+    image: sheepkiller/kafka-manager:stable
+    container_name: kafka-manager
+    hostname: kafka-manager
+    #    network_mode: host
+    ports:
+      - "9000:9000"
+    links:
+      - kafka
+      - zookeeper
+    environment:
+      KM_VERSION: 2.0.0.2
+      ZK_HOSTS: "zookeeper:2181"
+      APPLICATION_SECRET: "letmein"
+
 
   postgresql:
     image: debezium/postgres:10
@@ -73,17 +89,29 @@ services:
     volumes:
       - ./postgresql/data:/var/lib/postgresql/data
 
-  kafka-manager:
-    image: sheepkiller/kafka-manager
-    container_name: kafka-manager
-    hostname: kafka-manager
-    #    network_mode: host
+
+  # 图数据库相关
+  zero:
+    image: dgraph/dgraph:v1.0.16
+    container_name: dgraph_zero
+    volumes:
+      - ./zero/data-volume:/dgraph
     ports:
-      - "9000:9000"
-    links:
-      - kafka
-      - zookeeper
-    environment:
-      KM_VERSION: 2.0.0.2
-      ZK_HOSTS: "zookeeper:2181"
-      APPLICATION_SECRET: "letmein"
+      - 5080:5080
+      - 6080:6080
+    command: dgraph zero --my=zero:5080 --replicas 3
+  server:
+    image: dgraph/dgraph:v1.0.16
+    container_name: dgraph_server
+    volumes:
+      - ./server/data-volume:/dgraph
+    ports:
+      - 8080:8080
+      - 9080:9080
+    command: dgraph alpha --my=server:7080 --lru_mb=2048 --zero=zero:5080
+  ratel:
+    image: dgraph/dgraph:v1.0.16
+    container_name: dgraph_ratel
+    ports:
+      - 8000:8000
+    command: dgraph-ratel

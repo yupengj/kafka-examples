@@ -21,7 +21,7 @@ public class KafkaUtils {
 
 	private static AdminClient getAdminClient() {
 		Properties props = new Properties();
-		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.2.26:9092");
+		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.4.109:9092");
 		return AdminClient.create(props);
 	}
 
