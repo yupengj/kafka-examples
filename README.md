@@ -60,10 +60,10 @@ docker inspect <容器名称/容器id>
 curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" localhost:8083/connectors/ -d @connect-plugins/postgres.json
 
 # 重启连接器 restart
-curl -X POST localhost:8083/connectors/ibom-connector/restart
+curl -X POST localhost:8083/connectors/ibom-connect/restart
 
 # 删除连接器
-curl -X DELETE localhost:8083/connectors/ibom-connector
+curl -X DELETE localhost:8083/connectors/ibom-connect
 
 # 查询所有连接器
 curl localhost:8083/connector-plugins
@@ -72,10 +72,10 @@ curl localhost:8083/connector-plugins
 curl localhost:8083/connectors
 
 # 查看连接器状态
-curl localhost:8083/connectors/ibom-connector/status
+curl localhost:8083/connectors/ibom-connect/status
 
 # 查看连接器配置
-curl localhost:8083/connectors/ibom-connector/config
+curl localhost:8083/connectors/ibom-connect/config
 ```
 
 ## 修改记录
