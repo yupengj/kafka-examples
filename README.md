@@ -7,7 +7,7 @@
 - docker-compose 安装。在终端执行下面命令。输出 docker-compose 版本标识安装成功
 
 ```shell
-sudo curl -L https://github.com/docker/compose/releases/download/1.8.0/run.sh > /usr/local/bin/docker-compose
+sudo curl -L https://github.com/docker/compose/releases/download/1.25.0-rc2/run.sh > /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 docker-compose --version
 ```
