@@ -140,10 +140,3 @@ curl localhost:8083/connectors/ibom-connect/config
     "version": "5.3.0-ccs"
 }]
 ```
-
--------
-
-## 随记
-
-- 下载文件 wget http://192.168.14.106/tools/postgres.json
-
