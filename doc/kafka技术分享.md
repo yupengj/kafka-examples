@@ -1,28 +1,33 @@
-# kafka 技术分享
+# kafka 技术分享与变更影响分析实现
 
 ## 目录
 
 - kafka 是什么 `不细讲`
     - Kafka 诞生背景
-    - Kafka 的主要设计目标
+    - Kafka 主要设计目标
     - 为什么选择 Kafka
 - kafka 安装以及配置 `不细讲`
 - kafka 核心概念
 - Kafka Connector(连接器)
     - 作用
-    - 原理
     - 安装及配置 `不细讲`
     - 演示 postgres 连接器数据同步
+    - 如何自定义连接器
+    - 自定义 dgraph 连接器(实现向 dgraph 数据库创建图节点)
     - 演示数据从 postgres 到 dgraph 同步
-- 目前使用 kafka 做了什么
-
+- 节点间的关系(边)
+    - 边的建立和边的元数据
+    - 用边的元数据指导边的生成
+- 图的展现形式示例
+- 一阶段规划的关系图
+- 总结-变更影响架构图
 
 ## kafka 是什么
 
 **Kafka 是一个高吞吐量、分布式的发布一订阅消息系统**
 
 ### Kafka 诞生背景
-Kafka 是在 Linkedln 内部诞生的，Linkedln 使用的数据系统包括：
+Kafka 是在 Linkedln 内部诞生的，在 Linkedln 内部使用的数据系统包括：
 - 全文搜索
 - Social Graph （社会图谱）
 - Voldemort （键值存储）
@@ -43,7 +48,7 @@ Kafka 是在 Linkedln 内部诞生的，Linkedln 使用的数据系统包括：
 
 ![kafka_bj2](https://raw.githubusercontent.com/yupengj/kafka-examples/master/doc/images/kafka_bj2.png)
 
-### Kafka 的主要设计目标
+### Kafka 主要设计目标
 Kafka 作为一种分布式的 、基于发布／订阅的消息系统，其主要设计目标如下：
 - 以时间复杂度为 0 ( I ）的方式提供消息持久化能力，即使对 TB 级以上的数据也能保证常数时间的访问性能 。
 - 高吞吐率 ，即使在非常廉价的商用机器上也能做到单机支持每秒 lOOK 条消息的传输 。
@@ -106,9 +111,6 @@ Topic 的 Partition 含有 N 个 Replica, N 为副本因子。其中一个 Repli
 
 消息生产者，即将消息发布到指定的 Topic 中，同时 Producer 也能决定此消息所属的 Partition ：比如基于 Round-Robin （轮询）方式或者 Hash （哈希）方式等一些算法 。
 也可以自定义分区器，继承 `org.apache.kafka.clients.producer.internals.DefaultPartitioner` 类或者实现 `org.apache.kafka.clients.producer.Partitioner` 接口
-
-**生产者发送消息主要步骤：**
-![producer_send](https://raw.githubusercontent.com/yupengj/kafka-examples/master/doc/images/producer_send.png)
 
 **生成者代码示例：**
 ```java
@@ -227,49 +229,151 @@ public class Consumer {
 ### kafka 4个核心API
 ![kafka-apis](http://kafka.apache.org/23/images/kafka-apis.png)
 
+### 演示简单的生产者和消费者程序
+
+看代码,跑一下
 
 ## Kafka Connector(连接器)
 
 ### 作用
-### 原理
+
+为了解决不同系统之间的数据同步， Kafka连接器用一个标准框架来解决这些问题。 它把连接器
+需要解决的故障容错、分区扩展、偏移量管理、发送语义、管理和监控等问题抽象出来，这样开发和
+使用连接器就变得非常简单。 用户只需要在配置文件中定义连接器，就可以将数据导人或导出 Kafka
+
+Kafka连接器只是一个组件，它需要和具体的数据源结合起来使用 。 数据源可以分成两种：源数
+据源（ data source ，也叫作“源系统”）和目标数据源（ Data Sink ，也叫作“目标系统”）。 Kafka连接
+器和源系统一起使用时，它会将源系统的数据导人到Kafka集群。 Kafka连接器和目标系统一起使用时，
+它会将Kafka集群的数据导人到目标系统
+
+如下图所示中间部分是kafka连接器的内部组件，连接器使用源连接器（ SourceConnector ）
+从源系统导人数据到Kafka集群，使用目标连接器（ Sink Connector ）从Kafka集群导出数据到目标系统。 
+源连接器会写数据到Kafka集群，内部会有生产者对象。 目标连接器会消费Kafka集群的数据，内部会有消费者对象。
+
+![kafka_connect1](https://raw.githubusercontent.com/yupengj/kafka-examples/master/doc/images/kafka_connect1.png)
+
+> 箭头代表数据流向
+
 ### 安装及配置
 不细讲， ppt 中有连接器的安装与配置。kafka docker 环境安装文档中也有docker版的连接器安装与配置
 
 ### 演示 postgres 连接器数据同步
+
+> 演示方案：使用公司 kafka, kafka-connect, postgres 环境(因为 topic-ui 可以看到 topic 中的数据 )
+1. 查看所有的连接器 `curl localhost:8083/connector-plugins`
+2. 查看活跃的连接器 `curl localhost:8083/connectors`
+3. 看一下启动连接器的参数 .json 文件
+4. 启动连接器 `curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" localhost:8083/connectors/ -d @postgres.json` 
+5. 在 postgres 数据库 mstdata schema 中新建一个 test 表。并执行新增、修改、删除操作
+```sql
+CREATE TABLE mstdata.md_test
+(
+    id   serial primary key,
+    name text,
+    age  int
+);
+insert into mstdata.md_test(name, age) VALUES ('zhangsan', 22);
+insert into mstdata.md_test(name, age) VALUES ('lisi', 11);
+update mstdata.md_test set age = age + 10 where name = 'zhangsan';
+delete from mstdata.md_test where name = 'lisi';
+delete from mstdata.md_test mt;
+select * from mstdata.md_test mt;
+```
+
+6. 使用消费者客户端消费 test 表在kafka中产生的主题, 看数据变化, 看数据结构。
+
 ### 如何自定义连接器
+
+在编写自定义连接器前，我们先看一下连接器主要类结构。如下图
+
+![kafka_connect2](https://raw.githubusercontent.com/yupengj/kafka-examples/master/doc/images/kafka_connect2.png)
+
+> 1. Worker 由于每个任务都有一个专用线程，因此这个类主要只是一个容器。
+> 2. WorkerConnector 是连接器的容器，主要负责管理连接器的生命周期(启动、停止等)
+> 3. WorkerTask 主要处理单个任务的线程类
+> 4. Kafka 连接器的主要组件是 Worker、Connector 和 Task, 这3 个类分别是Java进程、抽象类和
+  接口 。 WorkerTask 及其实现类（ WorkerSourceTask 和 WorkerSinkTask）是线程类 。 虽然 Task
+  接口不是一个线程类，但框架内置的 WorkerTask 则是一个线程类 。内置的线程类会循环调
+  用自定义实现的任务类，这样用户的任务实现类就不需要以线程的角度来处理数据同步。
+
+### 自定义 dgraph 连接器(实现向 dgraph 数据库创建图节点)
+
+dgraph 连接器工作流程图
+
+![kafka_connect_dgraph](https://raw.githubusercontent.com/yupengj/kafka-examples/master/doc/images/kafka_connect_dgraph.png)
+ 
+> - DgraphSinkTask 执行任务的类，其中 put 方法是连接器向 DgraphSinkTask 类put数据的入口
+> - DgraphSinkWriter 接收 DgraphSinkTask 类传递的数据，进行序列化、写入缓冲类
+> - BufferedRecords 数据缓存类，按批次向数据库保存
+> - DgraphSinkMapping 负责修改或删除的数据映射 uid(图数据库唯一标记)
+> - DgraphSinkClient 封装了与图数据库交互的方法
+> - DgraphSinkConverter 复制序列化连接器 put 过来的数据
+
 ### 演示 postgres 数据库到 dgraph 数据同步
 
-## 目前使用 kafka 做了什么
+> 演示方案：使用公司 kafka, kafka-connect, postgres, dgraph 环境
+1. 演示在 bom 测试系统新增，修改，删除变更单信息（可以是任何对象）, 查看数据是否同步到图数据库
+2. 查看图数据中节点的 object_type 和 object_id
 
-画一个目前各个系统直接的关系和数据的流向。
+## 节点间的关系(边)
+
+### 边的建立和边的元数据
+图数据库中的边基本可以由关系型数据库中的两种模式来表达
+1. 主键与外键的参照引用
+2. 字段与业务上唯一编码的弱引用
+
+![dgraph_b1](https://raw.githubusercontent.com/yupengj/kafka-examples/master/doc/images/dgraph_b1.png)
+
+对上图中的连接线用自然语言描述如下：
+```text
+1. mstdata.md_product_node 通过 parent_id 与 mstdata.md_product_node 中 md_product_node_id 的参照构成了父子关系；
+2. mstdata.md_product_node 通过 part_id 与 mstdata.md_material 中 md_material_id 的参照构成了实例化关系；
+3. bommgmt.bm_part_assembly 通过 master_part_id 与 mstdata.md_material 中 md_material_id 的参照构成了构成关系；
+4. bommgmt.bm_part_assembly 通过 sub_part_id 与 mstdata.md_material 中 md_material_id 的参照构成了使用关系；
+5. bommgmt.bm_part_assembly 通过 usage_value 与 mstdata.md_feature 中 feature_code 的弱引用构成了使用关系；
+6. ... ... ... ...
+```
+
+构建边的元数据，边的元数据是可配置的。数据格式如下图：
+![dgraph_b2](https://raw.githubusercontent.com/yupengj/kafka-examples/master/doc/images/dgraph_b2.png)
+
+### 用边的元数据指导边的生成
+
+1. 生成边的主题
+
+![dgraph_b3](https://raw.githubusercontent.com/yupengj/kafka-examples/master/doc/images/dgraph_b3.png)
+
+> 自定义连接器中对每一条记录均生成一个节点，同时设置object_type与object_id属性，object_type对应数据库表名，object_id为主键ID，因此上述生成的主题已经表达了节点之间的关系。
+  弱引用字段不从图数据库本身查询是因为相关联节点有可能在图数据库中并不存在，而只有作为源头的关系型数据库才是最完整的。
+
+2. 根据边的主题创建 dgraph 中节点的边
+
+![dgraph_b4](https://raw.githubusercontent.com/yupengj/kafka-examples/master/doc/images/dgraph_b4.png)
+
+> 1. 自定义连接器中会向一个中间主题记录object_type、object_id与数据库内部UID的映射关系，应用程序从该主题消费后会保存到内存中。
+> 2. 优先从内存中获取源节点与目标节点的UID，获取不到时会尝试从图数据库直接获取，并更新内存。
+> 3. 经过上述两步，如果源节点与目标节点有任意一个不存在UID，表示此节点还未创建，此时边不能创建。
+> 4. 若边不能创建，需要把记录写回到主题末端，以便消费者程序可以再次读取。
+
+## 图的展现形式示例
+
+![dgraph_t1](https://raw.githubusercontent.com/yupengj/kafka-examples/master/doc/images/dgraph_t1.png)
+
+## 一阶段规划的关系图
+
+![dgraph_t2](https://raw.githubusercontent.com/yupengj/kafka-examples/master/doc/images/dgraph_t2.png)
+
+
+## 总结-变更影响架构图
+
+![bgyxfx](images/bgyxfx.png)
 
 ------
 ## 参考
-
-
-------
-问题
-1. kafka 的分区信息存储在哪里？
-
-
-```json
-1.简介Kafka
-kafka是什么？
-一些核心概念，如生产者、消费者、Broker、主题、分区
-一个简单的生产者和消费者（演示）
-安装、配置、关键参数（不讲，自己看PPT）
-提供一个docker运行环境（不详细讲）
-2.简介
-kafka connector的作用
-如何从头配置一个kafka connector
-对exactly_once的支持
-演示实际的数据同步与增删改
-3.自定义Connector
-如何实现自己的connector（简介思想）
-演示到图数据库的同步
-4.变更影响分析
-如何利用图节点的边做变更的影响分析？
-构建边程序的设计思路
-演示边的创建
-一些关键的业务场景探讨
-```
+- Kafka docker 环境安装和配置：https://github.com/yupengj/kafka-examples/blob/master/README.md
+- Kafka 示例代码仓库： https://github.com/yupengj/kafka-examples
+- Kafka 官方文档：http://kafka.apache.org/documentation
+- Dgraph 连接器代码仓库：https://git.gantcloud.com/ibom/kafka-connect-dgraph
+- Kafka 连接器 hub ： https://www.confluent.io/hub/
+- 《Kafka权威指南》
+- 《Kafka技术内幕-图文详解Kafka源码设计与实现》
