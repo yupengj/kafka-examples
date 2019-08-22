@@ -28,7 +28,7 @@ public class KafkaUtilsTest {
 		kafkaUtils.findAllTopics();
 	}
 
-	@Test
+//	@Test
 	public void deleteTopics() {
 		kafkaUtils.deleteTopics(Collections.singletonList("jiangyp_test_topic_1"));
 	}
