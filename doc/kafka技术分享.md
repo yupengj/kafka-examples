@@ -366,7 +366,7 @@ dgraph 连接器工作流程图
 
 ## 总结-变更影响架构图
 
-![bgyxfx](images/bgyxfx.png)
+![bgyxfx](https://raw.githubusercontent.com/yupengj/kafka-examples/master/doc/images/bgyxfx.png)
 
 ------
 ## 参考
