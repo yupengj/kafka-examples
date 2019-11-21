@@ -30,6 +30,6 @@ public class KafkaUtilsTest {
 
 //	@Test
 	public void deleteTopics() {
-		kafkaUtils.deleteTopics(Collections.singletonList("jiangyp_test_topic_1"));
+		kafkaUtils.deleteTopics(Collections.singletonList("ibom-oracle-MD_MATERIAL"));
 	}
 }

@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -14,8 +15,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 public class ConsumerTest {
 	private static final Logger LOG = LoggerFactory.getLogger(Consumer.class);
@@ -52,11 +51,13 @@ public class ConsumerTest {
 		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
 		createKafkaConsumer();
 
-		kafkaConsumer.subscribe(Collections.singletonList("ibom.mstdata.md_test"));
+		kafkaConsumer.subscribe(Collections.singletonList("IBOM.ORACLE.MD_SUPPLIER"));
 
+		long count = 0;
 		while (true) {
 			ConsumerRecords<JsonNode, JsonNode> records = kafkaConsumer.poll(Duration.ofSeconds(1));
-			records.forEach(record -> LOG.info(record.toString()));
+			count += records.count();
+			System.out.println("count : " + count);
 		}
 	}
 }
