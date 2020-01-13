@@ -28,7 +28,7 @@ public class Producer {
 		props.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, DemoPartitioner.class);// 自定义分区器
 		KafkaProducer<String, String> kafkaProducer = new KafkaProducer<>(props);
 
-		boolean isAsync = false;
+		boolean isAsync = true;
 		int count = 0;
 		while (true) {
 			String messageKey = "key_" + (++count);
