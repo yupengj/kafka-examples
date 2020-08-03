@@ -17,6 +17,7 @@ import java.util.Properties;
 @Slf4j
 public class Consumer {
     public static void main(String[] args) {
+
         Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaConfig.BOOTSTRAP_SERVERS_CONFIG);// kafka 集群
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "test_1"); // 消费组id
@@ -26,7 +27,7 @@ public class Consumer {
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 
-		final String topic = "test";
+        final String topic = "ibom.bommgmt.bm_part_assembly_ebom";
         KafkaConsumer<String, String> kafkaConsumer = new KafkaConsumer<>(props);
         kafkaConsumer.subscribe(Collections.singletonList(topic));
         long start = System.currentTimeMillis();
@@ -34,7 +35,7 @@ public class Consumer {
         while (true) {
             ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofSeconds(1));
             for (ConsumerRecord<String, String> record : records) {
-                log.info("Received message topic {} : ({}, {}) at partition {} offset {}", record.topic(), record.key(), record.value(), record.partition(), record.offset());
+                log.info("Received message topic {} partition {} offset {} key {} value {}", record.topic(), record.partition(), record.offset(), record.key(), record.value());
             }
             count += records.count(); // 记录累加
             if (records.count() == 0) {

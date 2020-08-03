@@ -53,7 +53,7 @@ public class ConsumerTest {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         createKafkaConsumer();
 
-        kafkaConsumer.subscribe(Collections.singletonList("ibom.mstdata.md_material"));
+        kafkaConsumer.subscribe(Collections.singletonList("ibom.mstdata.md_change"));
 
         long count = 0;
         while (true) {
