@@ -28,6 +28,7 @@ public class KafkaUtilsTest {
     @Test
     public void findAllTopics() throws ExecutionException, InterruptedException {
         final Set<String> allTopics = kafkaUtils.findAllTopics();
+        allTopics.forEach(System.out::println);
     }
 
     @Test
@@ -39,6 +40,7 @@ public class KafkaUtilsTest {
                 deleteTops.add(allTopic);
             }
         }
+        deleteTops.forEach(System.out::println);
         kafkaUtils.deleteTopics(deleteTops);
     }
 
