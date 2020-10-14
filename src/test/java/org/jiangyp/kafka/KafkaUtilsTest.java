@@ -1,5 +1,9 @@
 package org.jiangyp.kafka;
 
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.DescribeClusterResult;
+import org.apache.kafka.common.Node;
+import org.apache.kafka.common.acl.AclOperation;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +40,7 @@ public class KafkaUtilsTest {
         final Set<String> allTopics = kafkaUtils.findAllTopics();
         List<String> deleteTops = new ArrayList<>();
         for (String allTopic : allTopics) {
-            if (allTopic.startsWith("ibom.")) {
+            if (allTopic.equals("ibom.core.ts_acct_user")) {
                 deleteTops.add(allTopic);
             }
         }
@@ -48,5 +52,16 @@ public class KafkaUtilsTest {
     public void deleteAll() throws ExecutionException, InterruptedException {
         final Set<String> allTopics = kafkaUtils.findAllTopics();
         kafkaUtils.deleteTopics(allTopics);
+    }
+
+    @Test
+    public void c() throws ExecutionException, InterruptedException {
+        final AdminClient adminClient = kafkaUtils.adminClient();
+        final DescribeClusterResult describeClusterResult = adminClient.describeCluster();
+
+        for (Node node : describeClusterResult.nodes().get()) {
+            System.out.println(node);
+        }
+        System.out.println("aa");
     }
 }

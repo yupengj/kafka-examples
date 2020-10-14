@@ -42,5 +42,8 @@ public class KafkaUtils implements AutoCloseable {
         adminClient.deleteTopics(topics);
     }
 
+    public AdminClient adminClient() {
+        return this.adminClient;
+    }
 
 }

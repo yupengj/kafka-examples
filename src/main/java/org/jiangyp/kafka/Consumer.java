@@ -8,7 +8,8 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
 import java.time.Duration;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -27,9 +28,11 @@ public class Consumer {
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 
-        final String topic = "ibom.bommgmt.bm_part_assembly_ebom";
+        List<String> topics = new ArrayList<>();
+        topics.add("ibom.mstdata.md_change");
+        topics.add("ibom.mstdata.md_change_ext");
         KafkaConsumer<String, String> kafkaConsumer = new KafkaConsumer<>(props);
-        kafkaConsumer.subscribe(Collections.singletonList(topic));
+        kafkaConsumer.subscribe(topics);
         long start = System.currentTimeMillis();
         int count = 0, num = 10;// 有10次拉取的数据记录为 0 时 结束轮询
         while (true) {
@@ -45,6 +48,6 @@ public class Consumer {
                 }
             }
         }
-        log.info("poll topic {} size {} time {} ms", topic, count, System.currentTimeMillis() - start);
+        log.info("poll topic {} size {} time {} ms", topics, count, System.currentTimeMillis() - start);
     }
 }
