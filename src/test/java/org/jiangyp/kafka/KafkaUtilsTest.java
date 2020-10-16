@@ -57,11 +57,5 @@ public class KafkaUtilsTest {
     @Test
     public void c() throws ExecutionException, InterruptedException {
         final AdminClient adminClient = kafkaUtils.adminClient();
-        final DescribeClusterResult describeClusterResult = adminClient.describeCluster();
-
-        for (Node node : describeClusterResult.nodes().get()) {
-            System.out.println(node);
-        }
-        System.out.println("aa");
     }
 }

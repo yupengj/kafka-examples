@@ -9,8 +9,10 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * 消息消费者
@@ -18,7 +20,6 @@ import java.util.Properties;
 @Slf4j
 public class Consumer {
     public static void main(String[] args) {
-
         Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaConfig.BOOTSTRAP_SERVERS_CONFIG);// kafka 集群
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "test_1"); // 消费组id
@@ -29,16 +30,22 @@ public class Consumer {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 
         List<String> topics = new ArrayList<>();
-        topics.add("ibom.mstdata.md_change");
-        topics.add("ibom.mstdata.md_change_ext");
+        topics.add("ibomExtTest.mstdata.md_material2");
         KafkaConsumer<String, String> kafkaConsumer = new KafkaConsumer<>(props);
         kafkaConsumer.subscribe(topics);
+        Set<String> keySet = new HashSet<>();
         long start = System.currentTimeMillis();
-        int count = 0, num = 10;// 有10次拉取的数据记录为 0 时 结束轮询
+        int count = 0, num = 30;// 有10次拉取的数据记录为 0 时 结束轮询
         while (true) {
             ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofSeconds(1));
             for (ConsumerRecord<String, String> record : records) {
                 log.info("Received message topic {} partition {} offset {} key {} value {}", record.topic(), record.partition(), record.offset(), record.key(), record.value());
+                if (record.value() == null || record.value().equals("null")) {
+                    keySet.remove(record.key());
+                    log.info("remove key {}", record.key());
+                } else {
+                    keySet.add(record.key());
+                }
             }
             count += records.count(); // 记录累加
             if (records.count() == 0) {
@@ -47,7 +54,9 @@ public class Consumer {
                     break;
                 }
             }
+            keySet.remove(null);
+            keySet.remove("null");
+            log.info("poll topic {}, record size {}, table size {}, time {} ms", topics, count, keySet.size(), System.currentTimeMillis() - start);
         }
-        log.info("poll topic {} size {} time {} ms", topics, count, System.currentTimeMillis() - start);
     }
 }
