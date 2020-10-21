@@ -40,7 +40,7 @@ public class KafkaUtilsTest {
         final Set<String> allTopics = kafkaUtils.findAllTopics();
         List<String> deleteTops = new ArrayList<>();
         for (String allTopic : allTopics) {
-            if (allTopic.equals("ibom.core.ts_acct_user")) {
+            if (allTopic.startsWith("kafka-stream-merge-ext-table-1")) {
                 deleteTops.add(allTopic);
             }
         }

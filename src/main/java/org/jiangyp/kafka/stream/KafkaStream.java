@@ -22,7 +22,7 @@ public class KafkaStream {
     public static void main(String[] args) {
         Properties props = new Properties();
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaConfig.BOOTSTRAP_SERVERS_CONFIG);// kafka 集群
-        props.put(StreamsConfig.APPLICATION_ID_CONFIG, "kafka_stream_test_color_2"); // 流应用车型id，全局唯一
+        props.put(StreamsConfig.APPLICATION_ID_CONFIG, "kafka_stream_test_color_3"); // 流应用车型id，全局唯一
 //        props.put(StreamsConfig.PROCESSING_GUARANTEE_CONFIG, StreamsConfig.EXACTLY_ONCE);// 设置每 100 毫秒提交一次偏移量
         props.put(StreamsConfig.consumerPrefix(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG), "earliest");// 从消息开始的位置读
         props.put(StreamsConfig.consumerPrefix(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG), "false"); // 不自动管理偏移量,即不记录消费者偏移量，可以重复读取数据方便测试
@@ -35,7 +35,7 @@ public class KafkaStream {
         final Serde<JsonNode> valueSerde = Serdes.serdeFrom(custJsonNodeSerializer, custJsonDeserializer);
         final Consumed<String, JsonNode> consumed = Consumed.with(Serdes.String(), valueSerde);
 
-        final String leftTopic = "ibom.mstdata.md_change";
+        final String leftTopic = "ibom-raw.mstdata.md_color";
         final StreamsBuilder builder = new StreamsBuilder();
         builder.table(leftTopic, consumed).toStream().print(Printed.toSysOut());
         final KafkaStreams kStreams = new KafkaStreams(builder.build(), props);
@@ -46,6 +46,9 @@ public class KafkaStream {
                 kStreams.close();
                 latch.countDown();
             }
+        });
+        kStreams.setUncaughtExceptionHandler((t, e) -> {
+            log.warn("t:{},e:{}", t, e);
         });
         try {
             kStreams.start();

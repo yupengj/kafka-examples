@@ -1,0 +1,107 @@
+[
+  {
+    "mainTableName": "mstdata.md_address",
+    "extTableName": "mstdata.md_address_ext"
+  },
+  {
+    "mainTableName": "mstdata.md_application_form",
+    "extTableName": "mstdata.md_application_form_ext"
+  },
+  {
+    "mainTableName": "mstdata.md_part_type",
+    "extTableName": "mstdata.md_part_type_ext"
+  },
+  {
+    "mainTableName": "mstdata.md_material",
+    "extTableName": "mstdata.md_material_ext"
+  },
+  {
+    "mainTableName": "mstdata.md_part_design",
+    "extTableName": "mstdata.md_part_design_ext"
+  },
+  {
+    "mainTableName": "mstdata.md_part_supply",
+    "extTableName": "mstdata.md_part_supply_ext"
+  },
+  {
+    "mainTableName": "mstdata.md_supplier",
+    "extTableName": "mstdata.md_supplier_ext"
+  },
+  {
+    "mainTableName": "mstdata.md_part_service",
+    "extTableName": "mstdata.md_part_service_ext"
+  },
+  {
+    "mainTableName": "mstdata.md_part_deviation_index",
+    "extTableName": "mstdata.md_part_deviation_index_ext"
+  },
+  {
+    "mainTableName": "mstdata.md_part_desc",
+    "extTableName": "mstdata.md_part_desc_ext"
+  },
+  {
+    "mainTableName": "mstdata.md_color",
+    "extTableName": "mstdata.md_color_ext"
+  },
+  {
+    "mainTableName": "mstdata.md_product_type",
+    "extTableName": "mstdata.md_product_type_ext"
+  },
+  {
+    "mainTableName": "mstdata.md_product_node",
+    "extTableName": "mstdata.md_product_node_ext"
+  },
+  {
+    "mainTableName": "mstdata.md_product_structure",
+    "extTableName": "mstdata.md_product_structure_ext"
+  },
+  {
+    "mainTableName": "mstdata.md_vehicle_material",
+    "extTableName": "mstdata.md_vehicle_material_ext"
+  },
+  {
+    "mainTableName": "mstdata.md_plant",
+    "extTableName": "mstdata.md_plant_ext"
+  },
+  {
+    "mainTableName": "mstdata.md_plant_layout",
+    "extTableName": "mstdata.md_plant_layout_ext"
+  },
+  {
+    "mainTableName": "mstdata.md_route_line",
+    "extTableName": "mstdata.md_route_line_ext"
+  },
+  {
+    "mainTableName": "mstdata.md_route_node",
+    "extTableName": "mstdata.md_route_node_ext"
+  },
+  {
+    "mainTableName": "mstdata.md_change",
+    "extTableName": "mstdata.md_change_ext"
+  },
+  {
+    "mainTableName": "mstdata.md_feature",
+    "extTableName": "mstdata.md_feature_ext"
+  },
+  {
+    "mainTableName": "bommgmt.bm_part_assembly_ebom",
+    "extTableName": "bommgmt.bm_part_assembly_ext",
+    "metadataTableName": "bommgmt.bm_part_assembly"
+  },
+  {
+    "mainTableName": "bommgmt.bm_part_assembly_mbom",
+    "extTableName": "bommgmt.bm_part_assembly_ext",
+    "metadataTableName": "bommgmt.bm_part_assembly"
+  },
+  {
+    "mainTableName": "bommgmt.bm_part_assembly_sbom",
+    "extTableName": "bommgmt.bm_part_assembly_ext",
+    "metadataTableName": "bommgmt.bm_part_assembly"
+  },
+  {
+    "mainTableName": "bommgmt.bm_part_assembly_pbom",
+    "extTableName": "bommgmt.bm_part_assembly_ext",
+    "metadataTableName": "bommgmt.bm_part_assembly"
+  }
+]
+
