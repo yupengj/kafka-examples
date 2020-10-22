@@ -5,12 +5,11 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.metrics.Sensor;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -28,42 +27,33 @@ public class Consumer {
 //        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest"); // 从消息开始的位置读
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest"); // 从消息最新的位置
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false"); // 不自动管理偏移量,即不记录消费者偏移量，可以重复读取数据方便测试
+        props.put(ConsumerConfig.METRICS_RECORDING_LEVEL_CONFIG, Sensor.RecordingLevel.INFO);// 日志等级
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 
         KafkaConsumer<String, String> kafkaConsumer = new KafkaConsumer<>(props);
 
-        List<String> topics = new ArrayList<>();
-//        topics.add("ibom-raw.mstdata.md_part_type");
-//        kafkaConsumer.subscribe(topics);
+//        kafkaConsumer.subscribe(Arrays.asList("ibom-main.mstdata.md_part_type"));
 
-        Pattern pattern = Pattern.compile("ibom-main.*");
-        kafkaConsumer.subscribe(pattern);
+        kafkaConsumer.subscribe(Pattern.compile("ibom-main.*"));
 
         Set<String> keySet = new HashSet<>();
+        int count = 0;
         long start = System.currentTimeMillis();
-        int count = 0, num = 50;// 有10次拉取的数据记录为 0 时 结束轮询
         while (true) {
             ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofSeconds(1));
             for (ConsumerRecord<String, String> record : records) {
                 log.info("Received message topic {} partition {} offset {} key {} value {}", record.topic(), record.partition(), record.offset(), record.key(), record.value());
                 if (record.value() == null || record.value().equals("null")) {
                     keySet.remove(record.key());
-                    log.info("remove key {}", record.key());
                 } else {
                     keySet.add(record.key());
                 }
             }
-            count += records.count(); // 记录累加
-            if (records.count() == 0) {
-                num--;
-                if (num < 0) {
-//                    break;
-                }
-            }
+            count += records.count();
             keySet.remove(null);
             keySet.remove("null");
-            log.info("poll topic {}, pattern {}, record size {}, table size {}, time {} ms", topics, pattern, count, keySet.size(), System.currentTimeMillis() - start);
+            log.info("poll record size {}, table size {}, time {} ms", count, keySet.size(), System.currentTimeMillis() - start);
         }
     }
 }

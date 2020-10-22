@@ -2,7 +2,6 @@ package org.jiangyp.kafka.stream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
@@ -19,14 +18,11 @@ import org.jiangyp.kafka.KafkaConfig;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
 @Slf4j
 public class KafkaStreamJoin {
-
-    private static final ThreadLocal<DateFormat> format = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
 
     public static void main(String[] args) {
         Properties props = new Properties();
@@ -40,8 +36,8 @@ public class KafkaStreamJoin {
         final Serde<JsonNode> mergedValueSerde = Serdes.serdeFrom(new JsonSerializer(), new JsonDeserializer());
         final Consumed<String, JsonNode> consumed = Consumed.with(Serdes.String(), valueSerde);
 
-        final String leftTopic = "ibom-raw.mstdata.md_change";
-        final String rightTopic = "ibom-raw.mstdata.md_change_ext";
+        final String leftTopic = "ibom-raw.mstdata.md_part_type";
+        final String rightTopic = "ibom-raw.mstdata.md_part_type_ext";
 //        final String toTopic = "ibom-test-main.mstdata.md_change";
 
         final StreamsBuilder builder = new StreamsBuilder();
@@ -77,16 +73,5 @@ public class KafkaStreamJoin {
             System.exit(1);
         }
         System.exit(0);
-    }
-
-    private static JsonNode convertTimestamp(JsonNode timestampNode) {
-        if (timestampNode == null || timestampNode.isNull()) {
-            return timestampNode;
-        } else if (timestampNode.isLong()) {
-            final String format = KafkaStreamJoin.format.get().format(new Date(timestampNode.asLong()));
-            return TextNode.valueOf(format);
-        } else {
-            return timestampNode;
-        }
     }
 }
