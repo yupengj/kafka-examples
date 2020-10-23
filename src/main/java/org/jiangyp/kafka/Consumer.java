@@ -5,10 +5,10 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.common.metrics.Sensor;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -27,13 +27,13 @@ public class Consumer {
 //        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest"); // 从消息开始的位置读
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest"); // 从消息最新的位置
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false"); // 不自动管理偏移量,即不记录消费者偏移量，可以重复读取数据方便测试
-        props.put(ConsumerConfig.METRICS_RECORDING_LEVEL_CONFIG, Sensor.RecordingLevel.INFO);// 日志等级
+        props.put(ConsumerConfig.METRICS_RECORDING_LEVEL_CONFIG, "INFO");// 日志等级
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 
         KafkaConsumer<String, String> kafkaConsumer = new KafkaConsumer<>(props);
 
-//        kafkaConsumer.subscribe(Arrays.asList("ibom-main.mstdata.md_part_type"));
+//        kafkaConsumer.subscribe(Arrays.asList("ibom-raw.mstdata.md_color"));
 
         kafkaConsumer.subscribe(Pattern.compile("ibom-main.*"));
 
